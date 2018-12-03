@@ -17,17 +17,17 @@ func handleError(err error) {
 	os.Exit(-1)
 }
 
-func AliyunPutObject(bucket *oss.Bucket, srcPath string, destPath string) (err error) {
+func OSSPutObject(bucket *oss.Bucket, srcPath string, destPath string) (err error) {
 	err = bucket.PutObjectFromFile(destPath, srcPath)
 
 	return
 }
 
-func AliyunGetObjectURL(bucket *oss.Bucket) {
+func OSSGetObjectURL(bucket *oss.Bucket) {
 
 }
 
-func AliyunBucketClient(accKeyID string, accKeySecret string, bucketName string, endpoint string) (bucket *oss.Bucket, err error) {
+func OSSBucketClient(accKeyID string, accKeySecret string, bucketName string, endpoint string) (bucket *oss.Bucket, err error) {
 	client, err := oss.New(endpoint, accKeyID, accKeySecret)
 	if err != nil {
 		handleError(err)
@@ -72,10 +72,10 @@ func OSSmain(srcPath string) {
 	Date := utils.DateF()
 	destPath := Date + "/" + path.Base(srcPath)
 	// get bucket client
-	bucket, _ := AliyunBucketClient(config.AccKeyID, config.AccKeySecret, config.BucketName, config.Endpoint)
+	bucket, _ := OSSBucketClient(config.AccKeyID, config.AccKeySecret, config.BucketName, config.Endpoint)
 
 	// upload object
-	err = AliyunPutObject(bucket, srcPath, destPath)
+	err = OSSPutObject(bucket, srcPath, destPath)
 
 	if err != nil {
 		log.Println(err)
