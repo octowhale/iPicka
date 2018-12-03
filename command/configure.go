@@ -51,7 +51,7 @@ type Profile struct {
 
 // ConfigLoader loads config file and unmarshal it to json
 func ConfigLoader(profileKey string) (profile Profile) {
-	configFile := "../config/ipicka-demo.json"
+	configFile := "config/ipicka-demo.json"
 
 	// check config file exist
 	_, err := os.Stat(configFile)
@@ -65,7 +65,7 @@ func ConfigLoader(profileKey string) (profile Profile) {
 
 	var config Config
 	json.Unmarshal(configByte, &config)
-	log.Info(config.Config["aliyun"].AccKeyID)
+	// log.Info(config.Config["aliyun"].AccKeyID)
 
 	// profile
 
@@ -75,6 +75,6 @@ func ConfigLoader(profileKey string) (profile Profile) {
 		os.Exit(1)
 	}
 
-	log.Info(config.Config[profileKey])
+	// log.Info(config.Config[profileKey])
 	return config.Config[profileKey]
 }

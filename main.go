@@ -11,8 +11,6 @@ import (
 )
 
 func main() {
-	// command.Configure()
-	// command.OSSmain()
 
 	if err := cli.Root(root,
 		cli.Tree(put),
@@ -53,7 +51,8 @@ var put = &cli.Command{
 	Argv: func() interface{} { return new(childPutArgv) },
 	Fn: func(ctx *cli.Context) error {
 		argv := ctx.Argv().(*childPutArgv)
-		command.OSSmain(argv.File)
+		profile := command.ConfigLoader(argv.Profile)
+		command.OSSMain(profile, argv.File)
 		return nil
 	},
 }

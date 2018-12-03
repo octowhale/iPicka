@@ -1,9 +1,7 @@
 package command
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path"
@@ -17,16 +15,14 @@ func handleError(err error) {
 	os.Exit(-1)
 }
 
+// OSSPutObject uploads file to OSS bucket
 func OSSPutObject(bucket *oss.Bucket, srcPath string, destPath string) (err error) {
 	err = bucket.PutObjectFromFile(destPath, srcPath)
 
 	return
 }
 
-func OSSGetObjectURL(bucket *oss.Bucket) {
-
-}
-
+// OSSBucketClient returns bucket client
 func OSSBucketClient(accKeyID string, accKeySecret string, bucketName string, endpoint string) (bucket *oss.Bucket, err error) {
 	client, err := oss.New(endpoint, accKeyID, accKeySecret)
 	if err != nil {
@@ -39,54 +35,26 @@ func OSSBucketClient(accKeyID string, accKeySecret string, bucketName string, en
 	return
 }
 
-type OSSConfigStruct struct {
-	AccKeyID     string `json:"accKeyID"`
-	AccKeySecret string `json:"accKeySecret"`
-	BucketName   string `json:"bucketName"`
-	Domain       string `json:"domain,omitempty"`
-	Endpoint     string `json:"endpoint"`
-}
+// OSSMain the entry of oss bucket loader
+func OSSMain(profile Profile, src string) {
 
-func OSSmain(srcPath string) {
-
-	configFile := "config/ipicka.json"
-
-	// open file
-	ctx, _ := ioutil.ReadFile(configFile)
-
-	// json unmarshal
-	var config OSSConfigStruct
-	err := json.Unmarshal(ctx, &config)
-
-	if err != nil {
-
-	}
-
-	// check file is or not exist
-	// srcPath := os.Args[1]
-	_, err = os.Stat(srcPath)
-	if os.IsNotExist(err) {
-		log.Fatal("ERROR: target is not exist!")
-	}
-
-	Date := utils.DateF()
-	destPath := Date + "/" + path.Base(srcPath)
 	// get bucket client
-	bucket, _ := OSSBucketClient(config.AccKeyID, config.AccKeySecret, config.BucketName, config.Endpoint)
+	bucket, _ := OSSBucketClient(profile.AccKeyID, profile.AccKeySecret, profile.BucketName, profile.Endpoint)
 
-	// upload object
-	err = OSSPutObject(bucket, srcPath, destPath)
-
+	// upload
+	objectKey := utils.DateF() + "/" + path.Base(src)
+	err := OSSPutObject(bucket, src, objectKey)
 	if err != nil {
-		log.Println(err)
+		log.Fatalf("%s", err)
 	}
 
+	// output
 	var url string
-	if config.Domain == "" {
-		url = "http://" + config.BucketName + "." + config.Endpoint + "/" + destPath
+	if profile.Domain == "" {
+		url = "https://" + profile.BucketName + "." + profile.Endpoint + "/" + objectKey
 	} else {
-		url = config.Domain + "/" + destPath
+		url = profile.Domain + "/" + objectKey
 	}
-	// log.Println(url)
+
 	utils.Output(url)
 }
