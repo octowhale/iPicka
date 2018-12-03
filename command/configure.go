@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"os"
 
+	"github.com/labstack/gommon/log"
 	"github.com/mkideal/cli"
 )
 
@@ -17,11 +19,8 @@ type argConf struct {
 	Domain       string `cli:"domain" usage:"custom domain. Cname for bucket domain" prompt:"CUSTOM DOMAIN"`
 }
 
+// Configure generate config
 func Configure() {
-	configure()
-}
-
-func configure() {
 	cli.Run(new(argConf), func(ctx *cli.Context) error {
 		argv := ctx.Argv().(*argConf)
 		ctx.String("username=%s, password=%s\n", argv.AccKeyID, argv.AccKeySecret)
@@ -37,6 +36,45 @@ func configure() {
 	})
 }
 
-func json2file() {
+type Config struct {
+	Config map[string]Profile
+}
 
+type Profile struct {
+	// Provider     string `json:"Provider,omitempty"`
+	AccKeyID     string `json:"AccKeyID"`
+	AccKeySecret string `json:"AccKeySecret"`
+	BucketName   string `json:"BucketName"`
+	Domain       string `json:"Domain,omitemtpy"`
+	Endpoint     string `json:"Endpoint"`
+}
+
+// ConfigLoader loads config file and unmarshal it to json
+func ConfigLoader(profileKey string) (profile Profile) {
+	configFile := "../config/ipicka-demo.json"
+
+	// check config file exist
+	_, err := os.Stat(configFile)
+	if os.IsNotExist(err) {
+		log.Fatalf("config file : %s is not exist", configFile)
+		os.Exit(1)
+	}
+
+	// unmarshal
+	configByte, _ := ioutil.ReadFile(configFile)
+
+	var config Config
+	json.Unmarshal(configByte, &config)
+	log.Info(config.Config["aliyun"].AccKeyID)
+
+	// profile
+
+	// var profile Profile
+	if _, ok := config.Config[profileKey]; !ok {
+		log.Fatalf("Profile(%s) is not exist")
+		os.Exit(1)
+	}
+
+	log.Info(config.Config[profileKey])
+	return config.Config[profileKey]
 }
