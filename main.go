@@ -43,7 +43,8 @@ var root = &cli.Command{
 // put command
 type childPutArgv struct {
 	cli.Helper
-	File string `cli:"file,f" usage:"指定上传文件"`
+	File    string `cli:"file,f" usage:"指定上传文件"`
+	Profile string `cli:"profile,p" usage:"指定图床配置文件, (default)" dft:"default" `
 }
 
 var put = &cli.Command{
@@ -60,6 +61,7 @@ var put = &cli.Command{
 // configure command
 type childConfigureArgv struct {
 	cli.Helper
+	Profile string `cli:"profile,p" usage:"指定图床配置文件, (default)" dft:"default" `
 }
 
 var configure = &cli.Command{
