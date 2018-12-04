@@ -5,7 +5,7 @@ import "github.com/mkideal/cli"
 // root command
 type rootT struct {
 	cli.Helper
-	// Name string `cli:"name" usage:"your name"`
+	// Conf string `cli:"conf,c" usage:"ipicka config file" dft:"$HOME/.ipika.json"`
 }
 
 var root = &cli.Command{
@@ -14,8 +14,6 @@ var root = &cli.Command{
 	// ctx.Argv() is if Command.Argv == nil or Command.Argv() is nil
 	Argv: func() interface{} { return new(rootT) },
 	Fn: func(ctx *cli.Context) error {
-		// argv := ctx.Argv().(*rootT)
-		// ctx.String("Hello, root command, I am %s\n", argv.Name)
 		return nil
 	},
 }
