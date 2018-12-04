@@ -133,9 +133,9 @@ func ConfigWriter(filePath string, argv *configureT) {
 		log.Fatal(err)
 	}
 	defer fobj.Close()
-	n, err := fobj.WriteString(string(cData))
+	_, err = fobj.WriteString(string(cData))
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Println(n)
+	return
 }
