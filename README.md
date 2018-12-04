@@ -16,4 +16,4 @@
 
 ### profile list
 
-- [ ] 支持 `--profile name` 选择图床配置。
+- [x] 支持 `--profile name` 选择图床配置。
