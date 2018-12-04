@@ -4,6 +4,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/mkideal/cli"
@@ -60,7 +61,9 @@ var put = &cli.Command{
 // configure command
 type childConfigureArgv struct {
 	cli.Helper
-	Profile string `cli:"profile,p" usage:"指定图床配置文件, (default)" dft:"default" `
+	Profile string `cli:"profile" usage:"指定图床配置文件, (default)" dft:"default" `
+	// Brofile string `cli:"brofile" usage:"指定图床配置文件, (default)" dft:"default" `
+	// Export  string `cli:"export" usage:"导出配置模板"`
 }
 
 var configure = &cli.Command{
@@ -68,6 +71,9 @@ var configure = &cli.Command{
 	Desc: "参数管理",
 	Argv: func() interface{} { return new(childConfigureArgv) },
 	Fn: func(ctx *cli.Context) error {
+		argv := ctx.Argv().(*childConfigureArgv)
+		log.Println(argv)
+		// log.Println(argv.Brofile)
 		command.Configure()
 		return nil
 	},

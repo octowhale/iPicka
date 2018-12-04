@@ -10,8 +10,13 @@ import (
 	"github.com/mkideal/cli"
 )
 
+const (
+	configFile = "config/ipicka.json"
+)
+
 type argConf struct {
 	cli.Helper
+	Profile      string `cli:"profile"`
 	AccKeyID     string `cli:"accKeyID" usage:"ACCESS KEY for bucket" prompt:"ACCESS KEY"`
 	AccKeySecret string `cli:"accKeySecret" usage:"ACCESS SECRET for bucket" prompt:"ACCESS SECRET"`
 	BucketName   string `cli:"bucketName" usage:"bucket name" prompt:"BUCKET NAME"`
@@ -22,22 +27,38 @@ type argConf struct {
 // Configure generate config
 func Configure() {
 	cli.Run(new(argConf), func(ctx *cli.Context) error {
+
+		config := ConfigLoader()
+		fmt.Println(config)
+
 		argv := ctx.Argv().(*argConf)
-		ctx.String("username=%s, password=%s\n", argv.AccKeyID, argv.AccKeySecret)
+		// ctx.String("username=%s, password=%s\n", argv.AccKeyID, argv.AccKeySecret)
 
-		profile := map[string]string{"AccKeyID": argv.AccKeyID, "AccKeySecret": argv.AccKeySecret, "BucketName": argv.BucketName, "Endpoint": argv.Endpoint, "Domain": argv.Domain}
+		s := `{"AccKeyID": "%s", "AccKeySecret": "%s", "BucketName": "%s", "Endpoint": "%s", "Domain": "%s"}`
+		s = fmt.Sprintf(s, argv.AccKeyID, argv.AccKeySecret, argv.BucketName, argv.Endpoint, argv.Domain)
 
-		data, _ := json.Marshal(profile)
+		fmt.Println(s)
 
-		fmt.Printf("%s\n", data)
+		var profile Profile
+		err := json.Unmarshal([]byte(s), &profile)
+		if err != nil {
+			log.Fatalf("%s", err)
+		}
 
-		ioutil.WriteFile("config/ipicka.json", data, 0644)
+		config.Config[argv.Profile] = profile
+
+		// fmt.Println(config)
+
+		configByte, _ := json.MarshalIndent(config, "", "  ")
+		fmt.Println(string(configByte))
+
+		ConfigWriter(configByte, configFile)
 		return nil
 	})
 }
 
 type Config struct {
-	Config map[string]Profile
+	Config map[string]Profile `json:"config"`
 }
 
 type Profile struct {
@@ -51,7 +72,6 @@ type Profile struct {
 
 // ConfigLoader loads config file and unmarshal it to json
 func ConfigLoader() (config Config) {
-	configFile := "config/ipicka.json"
 
 	// check config file exist
 	_, err := os.Stat(configFile)
@@ -82,4 +102,12 @@ func ProfileLoader(profileKey string) (profile Profile) {
 
 	// log.Info(config.Config[profileKey])
 	return config.Config[profileKey]
+}
+
+func ConfigWriter(byte []byte, file string) {
+
+	fobj, _ := os.OpenFile(file, os.O_RDONLY|os.O_TRUNC|os.O_CREATE, 0644)
+	defer fobj.Close()
+	fobj.WriteString(string(byte))
+
 }
