@@ -1,20 +1,21 @@
-package command
+package storage
 
 import (
 	"context"
 	"fmt"
 
+	"github.com/octowhale/iPicka/utils"
 	"github.com/qiniu/api.v7/auth/qbox"
 	"github.com/qiniu/api.v7/storage"
 )
 
 // Qiniu is the config struct of Qcloud OSS bucket
 type Qiniu struct {
-	key          string // 密钥 key
-	sec          string // 密钥 secret
-	bucket       string // bucket 名称
-	region       string // bucket 区域
-	customDomain string // 用户自定域名
+	Key          string // 密钥 key
+	Sec          string // 密钥 secret
+	Bucket       string // bucket 名称
+	Region       string // bucket 区域
+	CustomDomain string // 用户自定域名
 }
 
 // Put 上传文件到 qiniu bucket
@@ -32,22 +33,22 @@ func cfgZone(region string) *storage.Zone {
 
 func (qiniu *Qiniu) upload(key string, localFile string) {
 
-	Logger().Debugln(qiniu)
-	bucket := qiniu.bucket
+	utils.Logger().Debugln(qiniu)
+	bucket := qiniu.Bucket
 	putPolicy := storage.PutPolicy{
 		Scope: bucket,
 	}
-	mac := qbox.NewMac(qiniu.key, qiniu.sec)
-	Logger().Debugln(mac)
+	mac := qbox.NewMac(qiniu.Key, qiniu.Sec)
+	utils.Logger().Debugln(mac)
 
 	upToken := putPolicy.UploadToken(mac)
-	Logger().Debugln(upToken)
+	utils.Logger().Debugln(upToken)
 
 	cfg := storage.Config{}
 	// 空间对应的机房
 	cfg.Zone = &storage.ZoneHuadong
 	// cfg.Zone = cfgZone(qiniu.region)
-	Logger().Debugln(cfg.Zone)
+	utils.Logger().Debugln(cfg.Zone)
 
 	// 是否使用https域名
 	cfg.UseHTTPS = false
@@ -65,14 +66,14 @@ func (qiniu *Qiniu) upload(key string, localFile string) {
 	err := formUploader.PutFile(context.Background(), &ret, upToken, key, localFile, &putExtra)
 	if err != nil {
 		fmt.Println(err)
-		Logger().Errorln(err)
+		utils.Logger().Errorln(err)
 		return
 	}
 	fmt.Println(ret.Key, ret.Hash)
 
 	// fmt.Println(len(qiniu.customDomain))
-	if len(qiniu.customDomain) != 0 {
-		fmt.Println("![](https://" + qiniu.customDomain + "/" + ret.Key + ")")
+	if len(qiniu.CustomDomain) != 0 {
+		fmt.Println("![](https://" + qiniu.CustomDomain + "/" + ret.Key + ")")
 	}
 
 }

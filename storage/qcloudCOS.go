@@ -1,4 +1,4 @@
-package command
+package storage
 
 import (
 	"context"
@@ -8,16 +8,17 @@ import (
 	"os"
 	"strings"
 
+	"github.com/octowhale/iPicka/utils"
 	cos "github.com/tencentyun/cos-go-sdk-v5"
 )
 
 // QcloudCOS is the config struct of Qcloud OSS bucket
 type QcloudCOS struct {
-	key          string
-	sec          string
-	endpoint     string
-	schema       string
-	customDomain string
+	Key          string
+	Sec          string
+	Endpoint     string
+	Schema       string
+	CustomDomain string
 }
 
 // Put do upload thing to cos bucket
@@ -27,7 +28,10 @@ func (qcloud *QcloudCOS) Put(objectKey string, filepath string) {
 
 func (qcloud *QcloudCOS) upload(objectKey string, filepath string) {
 
-	u, _ := url.Parse(qcloud.endpoint)
+	u, err := url.Parse(qcloud.Endpoint)
+	if err != nil {
+		utils.Logger().Errorln(err)
+	}
 
 	b := &cos.BaseURL{BucketURL: u}
 	c := cos.NewClient(b, &http.Client{
@@ -43,7 +47,10 @@ func (qcloud *QcloudCOS) upload(objectKey string, filepath string) {
 		},
 	})
 
-	fBytes, _ := ioutil.ReadFile(filepath)
+	fBytes, err := ioutil.ReadFile(filepath)
+	if err != nil {
+		utils.Logger().Errorln(err)
+	}
 	// f := strings.NewReader("xxx")
 	f := strings.NewReader(string(fBytes))
 
@@ -56,8 +63,9 @@ func (qcloud *QcloudCOS) upload(objectKey string, filepath string) {
 	// 		// XCosACL: "private",
 	// 	},
 	// }
-	_, err := c.Object.Put(context.Background(), objectKey, f, nil)
+	_, err = c.Object.Put(context.Background(), objectKey, f, nil)
 	if err != nil {
+		utils.Logger().Errorln(err)
 		panic(err)
 	}
 }

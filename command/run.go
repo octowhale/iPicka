@@ -8,6 +8,8 @@ import (
 	"path"
 
 	"github.com/mkideal/cli"
+	"github.com/octowhale/iPicka/storage"
+	"github.com/octowhale/iPicka/utils"
 )
 
 const (
@@ -24,22 +26,22 @@ func upload(filepath string) {
 	var ipic ipickaer
 	b, err := ioutil.ReadFile(configPath)
 	if err != nil {
-		Logger().Errorln(err)
+		utils.Logger().Errorln(err)
 	}
 
 	c := Config{}
 	err = json.Unmarshal(b, &c)
 	if err != nil {
-		Logger().Errorln(err)
+		utils.Logger().Errorln(err)
 	}
 
 	switch c.Provider {
 	case "qcloudcos":
-		ipic = &QcloudCOS{c.Key, c.Sec, c.Endpoint, c.Schema, c.CustomDomain}
+		ipic = &storage.QcloudCOS{c.Key, c.Sec, c.Endpoint, c.Schema, c.CustomDomain}
 	case "qiniu":
-		ipic = &Qiniu{c.Key, c.Sec, c.Bucket, c.Region, c.CustomDomain}
+		ipic = &storage.Qiniu{c.Key, c.Sec, c.Bucket, c.Region, c.CustomDomain}
 	default:
-		ipic = &AliyunOSS{c.Key, c.Sec, c.Endpoint, c.Bucket, c.CustomDomain}
+		ipic = &storage.AliyunOSS{c.Key, c.Sec, c.Endpoint, c.Bucket, c.CustomDomain}
 	}
 
 	// objectKey, filepath := os.Args[1], os.Args[2]
@@ -69,7 +71,7 @@ func Do() {
 	// fmt.Println(len(os.Args))
 	if len(os.Args) < 3 {
 
-		Logger().Errorln("To few argumetns")
+		utils.Logger().Errorln("To few argumetns")
 		os.Exit(1)
 	}
 

@@ -1,18 +1,19 @@
-package command
+package storage
 
 import (
 	"fmt"
 
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
+	"github.com/octowhale/iPicka/utils"
 )
 
 // AliyunOSS is the config struct of Qcloud OSS bucket
 type AliyunOSS struct {
-	key          string
-	secret       string
-	endpoint     string
-	bucket       string
-	customDomain string
+	Key          string
+	Secret       string
+	Endpoint     string
+	Bucket       string
+	CustomDomain string
 }
 
 // upload put file to remote bucket
@@ -21,7 +22,7 @@ func (ali *AliyunOSS) upload(bucket *oss.Bucket, objectKey string, filepath stri
 
 	err := bucket.PutObjectFromFile(objectKey, filepath)
 	if err != nil {
-		Logger().Errorln(err)
+		utils.Logger().Errorln(err)
 		return false, err
 	}
 	return true, err
@@ -30,17 +31,17 @@ func (ali *AliyunOSS) upload(bucket *oss.Bucket, objectKey string, filepath stri
 // load return Aliyun Bucket Connection
 func (ali *AliyunOSS) load() (bucket *oss.Bucket) {
 
-	client, err := oss.New(ali.endpoint, ali.key, ali.secret)
+	client, err := oss.New(ali.Endpoint, ali.Key, ali.Secret)
 	if err != nil {
-		Logger().Error(err)
+		utils.Logger().Error(err)
 	}
-	Logger().Debug(client)
+	utils.Logger().Debug(client)
 
-	bucket, err = client.Bucket(ali.bucket)
+	bucket, err = client.Bucket(ali.Bucket)
 	if err != nil {
-		Logger().Error(err)
+		utils.Logger().Error(err)
 	}
-	Logger().Debug(bucket)
+	utils.Logger().Debug(bucket)
 
 	return bucket
 }
@@ -51,10 +52,10 @@ func (ali *AliyunOSS) Put(objectKey string, filepath string) {
 	ok, _ := ali.upload(bucket, objectKey, filepath)
 
 	var domain string
-	if ali.customDomain != "" {
-		domain = "https://" + ali.customDomain
+	if ali.CustomDomain != "" {
+		domain = "https://" + ali.CustomDomain
 	} else {
-		domain = "https://" + ali.bucket + "." + ali.endpoint
+		domain = "https://" + ali.Bucket + "." + ali.Endpoint
 	}
 
 	if ok {
