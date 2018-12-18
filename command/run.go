@@ -2,8 +2,12 @@ package command
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
+
+	"github.com/mkideal/cli"
 )
 
 const (
@@ -16,7 +20,7 @@ type ipickaer interface {
 }
 
 // Do is the main entrance
-func Do() {
+func upload(filepath string) {
 	var ipic ipickaer
 	b, err := ioutil.ReadFile(configPath)
 	if err != nil {
@@ -38,6 +42,39 @@ func Do() {
 		ipic = &AliyunOSS{c.Key, c.Sec, c.Endpoint, c.Bucket, c.CustomDomain}
 	}
 
-	objectKey, filepath := os.Args[1], os.Args[2]
+	// objectKey, filepath := os.Args[1], os.Args[2]
+	objectKey := c.Prefix + path.Base(filepath)
 	ipic.Put(objectKey, filepath)
+
+}
+
+type rootT struct {
+	cli.Helper
+	File string `cli:"file,f" usage:"filepath to upload"`
+}
+
+var root = &cli.Command{
+	Name: "root",
+	Desc: "upload file",
+	Argv: func() interface{} { return new(rootT) },
+	Fn: func(ctx *cli.Context) error {
+		argv := ctx.Argv().(*rootT)
+		upload(argv.File)
+		return nil
+	},
+}
+
+// Do the project
+func Do() {
+	// fmt.Println(len(os.Args))
+	if len(os.Args) < 3 {
+
+		Logger().Errorln("To few argumetns")
+		os.Exit(1)
+	}
+
+	if err := cli.Root(root).Run(os.Args[1:]); err != nil {
+		fmt.Println(os.Stdout, err)
+		os.Exit(1)
+	}
 }

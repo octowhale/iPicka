@@ -6,6 +6,7 @@ import (
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 )
 
+// AliyunOSS is the config struct of Qcloud OSS bucket
 type AliyunOSS struct {
 	key          string
 	secret       string

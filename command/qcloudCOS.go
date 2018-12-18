@@ -11,6 +11,7 @@ import (
 	cos "github.com/tencentyun/cos-go-sdk-v5"
 )
 
+// QcloudCOS is the config struct of Qcloud OSS bucket
 type QcloudCOS struct {
 	key          string
 	sec          string
@@ -19,6 +20,7 @@ type QcloudCOS struct {
 	customDomain string
 }
 
+// Put do upload thing to cos bucket
 func (qcloud *QcloudCOS) Put(objectKey string, filepath string) {
 	qcloud.upload(objectKey, filepath)
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/qiniu/api.v7/storage"
 )
 
+// Qiniu is the config struct of Qcloud OSS bucket
 type Qiniu struct {
 	key          string // 密钥 key
 	sec          string // 密钥 secret

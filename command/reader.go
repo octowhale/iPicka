@@ -13,6 +13,7 @@ func configReader() (j Config) {
 	return j
 }
 
+// Config is the main config for all projects
 type Config struct {
 	Bucket       string `json:"bucket,omitempty" example:"tangxin-test-02"`
 	CustomDomain string `json:"customDomain,omitempty" example:"cdn.tangx.in"`
@@ -22,4 +23,5 @@ type Config struct {
 	Region       string `json:"region,omitempty" example:"hangzhou"`
 	Schema       string `json:"schema,omitempty" example:"https"`
 	Sec          string `json:"sec,omitempty" example:"sec-123"`
+	Prefix       string `json:"prefix,omitempty" example:"file/static/`
 }
