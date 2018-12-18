@@ -15,8 +15,8 @@ type ipickaer interface {
 	Put(objectKey string, filepath string)
 }
 
-// Run is the main entrance
-func Run() {
+// Do is the main entrance
+func Do() {
 	var ipic ipickaer
 	b, err := ioutil.ReadFile(configPath)
 	if err != nil {

@@ -7,5 +7,5 @@ import (
 )
 
 func main() {
-	command.Run()
+	command.Do()
 }
