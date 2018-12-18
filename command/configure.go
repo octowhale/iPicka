@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"os"
 
 	"github.com/mkideal/cli"
+	"github.com/octowhale/iPicka/utils"
 )
 
 const (
@@ -20,8 +22,10 @@ func configReader(configPath string) (j ConfigureT) {
 	return j
 }
 
+// ConfigureT is the config os project
 type ConfigureT struct {
 	cli.Helper
+	Profile      string `cli:"profile" usage:"profile" dft:"default" prompt:"profile "`
 	Provider     string `cli:"provider" usage:"Provider" prompt:"Provider[aliyunoss/qcloudcos/qiniu] "`
 	Key          string `cli:"key" usage:"Bucket Access Key ID" prompt:"Access Key ID "`
 	Sec          string `cli:"sec" usage:"Bucket Access Key Secret" prompt:"Access Key Secret "`
@@ -49,4 +53,20 @@ func dumpConfig(argv *ConfigureT) {
 	fmt.Println(argv)
 
 	// c := new(Config)
+	// s, err := json.Marshal(argv)
+	s, err := json.MarshalIndent(argv, "", "  ")
+	fmt.Println(string(s))
+	if err != nil {
+		utils.Logger().Errorln(err)
+		os.Exit(1)
+	}
+	flag := os.O_CREATE | os.O_TRUNC | os.O_RDWR
+	fobj, err := os.OpenFile(configPath, flag, 0644)
+	if err != nil {
+		utils.Logger().Errorln(err)
+		os.Exit(1)
+	}
+	defer fobj.Close()
+
+	fobj.WriteString(string(s))
 }

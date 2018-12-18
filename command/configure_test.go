@@ -4,5 +4,5 @@ import "testing"
 
 func Test_Config(t *testing.T) {
 
-	configReader()
+	configReader("../config/config.json")
 }
