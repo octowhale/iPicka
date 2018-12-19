@@ -5,9 +5,9 @@
 
 ## TODO
 
-- [ ] 基本功能 阿里云 oss bucket
-- [ ] [子命令 `child command`](https://github.com/mkideal/cli#example-8-child-command)
-- [ ] [参数 `Flag`](https://github.com/mkideal/cli#example-2-flag)
+- [x] 基本功能 阿里云 oss bucket
+- [x] [子命令 `child command`](https://github.com/mkideal/cli#example-8-child-command)
+- [x] [参数 `Flag`](https://github.com/mkideal/cli#example-2-flag)
 
 ### bucket list
 
