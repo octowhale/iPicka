@@ -20,5 +20,5 @@ func New(config Config) (StorageClient, error) {
 		return client, err
 	}
 
-	return nil, errors.New("Invalid backend")
+	return nil, errors.New("Invalid StorageType")
 }

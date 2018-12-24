@@ -3,22 +3,25 @@ package main
 import (
 	"encoding/json"
 	"flag"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
 
-	"github.com/octowhale/iPicka/database/redis"
-	log "github.com/octowhale/iPicka/log"
+	"github.com/octowhale/iPicka/database"
 	"github.com/octowhale/iPicka/storage"
+	"github.com/sirupsen/logrus"
 )
 
 // Config for aliyun
 type StorageConfig = storage.Config
+type DatabaseConfig = database.Config
 
 type Config struct {
 	ConfigFile string
 	File       string
 	StorageConfig
+	DatabaseConfig
 }
 
 var config Config
@@ -36,6 +39,9 @@ func init() {
 	// flag.StringVar(&config.File, "file", "", "file or directory to uploads")
 }
 
+func init() {
+	initConfig()
+}
 func initConfig() error {
 	// configPath := config.ConfigFile
 
@@ -48,35 +54,45 @@ func initConfig() error {
 
 	_, err := os.Stat(config.ConfigFile)
 	if os.IsNotExist(err) {
-		log.Debug("Default Config is not exists")
+		logrus.Debugln("Default Config is not exists")
 		return err
-	} else {
-
-		log.Debug("Loading ... ", config.ConfigFile)
-		configBytes, err := ioutil.ReadFile(config.ConfigFile)
-		if err != nil {
-			return err
-		}
-
-		err = json.Unmarshal(configBytes, &config)
-		if err != nil {
-			return nil
-		}
-
-		// fmt.Println(config)
 	}
+
+	logrus.Debugln("Loading ... ", config.ConfigFile)
+	configBytes, err := ioutil.ReadFile(config.ConfigFile)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(configBytes, &config)
+	if err != nil {
+		return err
+	}
+
+	logrus.Debugln(config)
 	return nil
 }
 
-func initRedis() *redis.Config {
-	redis := &redis.Config{
-		RedisHost:     "172.18.8.88",
-		RedisPort:     "53697",
-		RedisDB:       11,
-		RedisPassword: "",
-	}
+var backend database.DatabaseClient
 
-	// client := redis.InitRedis()
-	// return redis, nil
-	return redis
+func init() {
+	backend, _ = database.New(DatabaseConfig{
+		DatabaseType: "mysql",
+		Host:         "172.18.8.88",
+		Port:         "60333",
+		User:         "root",
+		Password:     "SMdemT2Pm",
+		DBName:       "Demo2",
+	})
+}
+
+var client storage.StorageClient
+
+func init() {
+	client, err := storage.New(config.StorageConfig)
+
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(client)
 }

@@ -11,7 +11,7 @@ func Test_Redis(t *testing.T) {
 		RedisHost:     "172.18.8.88",
 		RedisPort:     "53697",
 		RedisPassword: "",
-		RedisDB:       11,
+		RedisDB:       "11",
 	}
 
 	// ExampleClient(client)

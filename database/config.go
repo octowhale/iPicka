@@ -1,8 +1,10 @@
 package database
 
 type Config struct {
-	Host     string
-	Password string
-	DB       string
-	Port     int
+	DatabaseType string
+	Host         string
+	Password     string
+	DBName       string
+	Port         string
+	User         string
 }
