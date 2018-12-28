@@ -51,7 +51,7 @@ func tryConnect(host, port, password, dbname string) (client *redis.Client, err 
 	if err != nil {
 		log.Errorf("Redis Ping() Error: %v", err)
 		panic(err)
-		return nil, err
+		// return nil, err
 	}
 	return client, nil
 
