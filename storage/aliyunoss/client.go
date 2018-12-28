@@ -1,56 +1,87 @@
 package aliyunoss
 
 import (
-	"fmt"
-
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
+	"github.com/sirupsen/logrus"
 )
 
-type Client struct {
-	key        string
-	sec        string
-	region     string
-	bucketName string
-	internal   bool
+type Config struct {
+	AccKey     string
+	AccSec     string
+	BucketName string
+	Region     string
+	Internal   bool
+	Endpoint   string
+	bucket     *oss.Bucket
 }
 
-func NewAliyunOSSClient(key, sec, region, bucketName string, internal bool) (*Client, error) {
-	return &Client{key, sec, region, bucketName, internal}, nil
+func NewOSSClient(key, sec, bucketname, region string, internal bool) *Config {
+
+	return &Config{
+		AccKey:     key,
+		AccSec:     sec,
+		Region:     region,
+		BucketName: bucketname,
+		Internal:   internal,
+	}
 }
 
-func (c *Client) load() (bucket *oss.Bucket, err error) {
+func (ali *Config) getClient() (client *oss.Client, err error) {
 
 	var endpoint string
-
-	if c.internal {
-		// oss-cn-hangzhou-internal.aliyuncs.com
-		endpoint = fmt.Sprintf("https://oss-%s-internal.aliyuncs.com", c.region)
+	// oss-cn-hangzhou-internal.aliyuncs.com
+	if ali.Internal {
+		endpoint = "https://oss-cn-hangzhou-internal.aliyuncs.com"
 	} else {
-		endpoint = fmt.Sprintf("https://oss-%s.aliyuncs.com", c.region)
+		endpoint = "https://oss-cn-hangzhou.aliyuncs.com"
 	}
 
-	client, err := oss.New(endpoint, c.key, c.sec)
+	client, err = oss.New(endpoint, ali.AccKey, ali.AccSec)
 	if err != nil {
-		return nil, err
+		logrus.Errorln("oss.New() Error:", err)
+		panic(err)
+		// return nil, err
 	}
 
-	bucket, err = client.Bucket(c.bucketName)
-	if err != nil {
-		return nil, err
-	}
+	return client, err
 
-	return bucket, nil
 }
 
-// Put file to remote
-func (c *Client) Put(object, filepath string) error {
-	// return bucket.PutObjectFromFile(object, filepath)
-	bucket, err := c.load()
+func (ali *Config) getBucket() (*oss.Bucket, error) {
 
+	if ali.bucket != nil {
+		logrus.Debugln(ali.bucket.BucketName)
+	} else {
+
+		client, err := ali.getClient()
+		if err != nil {
+			logrus.Errorln(err)
+		}
+
+		ali.bucket, err = client.Bucket(ali.BucketName)
+		if err != nil {
+			logrus.Debugln("oss.Client():", err)
+			return nil, err
+		}
+	}
+
+	return ali.bucket, nil
+
+}
+
+func (ali *Config) Put(object, file string) (err error) {
+
+	bucket, err := ali.getBucket()
 	if err != nil {
+		logrus.Debugln("Get bucket Error:", err)
+		panic(err)
+	}
+
+	err = bucket.PutObjectFromFile(object, file)
+	if err != nil {
+		logrus.Debugln("Put File:", err)
 		return err
 	}
 
-	return bucket.PutObjectFromFile(object, filepath)
-
+	return nil
 }

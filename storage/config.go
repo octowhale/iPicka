@@ -1,14 +1,10 @@
 package storage
 
 type Config struct {
-	Storage      string
-	AccKey       string
-	AccSec       string
-	CustomDomain string
-	HTTPSSchema  bool
-	Endpoint     string
-	Region       string
-	Bucket       string
-	Internal     bool
-	Prefix       string
+	Acckey     string `json:"acckey,omitempty"`
+	Accsec     string `json:"accsec,omitempty"`
+	Bucketname string `json:"bucketname,omitempty"`
+	Internal   bool   `json:"internal,omitempty"`
+	Region     string `json:"region,omitempty"`
+	Driver     string `json:"driver,omitempty"`
 }
