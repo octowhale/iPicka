@@ -1,18 +1,22 @@
 package aliyunoss
 
 import (
+	"fmt"
+
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 	"github.com/sirupsen/logrus"
 )
 
 type Config struct {
-	AccKey     string
-	AccSec     string
-	BucketName string
-	Region     string
-	Internal   bool
-	Endpoint   string
-	bucket     *oss.Bucket
+	AccKey       string
+	AccSec       string
+	BucketName   string
+	Region       string
+	Internal     bool
+	Endpoint     string
+	bucket       *oss.Bucket
+	CustomDomain string
+	Prefix       string
 }
 
 func NewOSSClient(key, sec, bucketname, region string, internal bool) *Config {
@@ -28,15 +32,17 @@ func NewOSSClient(key, sec, bucketname, region string, internal bool) *Config {
 
 func (ali *Config) getClient() (client *oss.Client, err error) {
 
-	var endpoint string
+	// var endpoint string
 	// oss-cn-hangzhou-internal.aliyuncs.com
 	if ali.Internal {
-		endpoint = "https://oss-cn-hangzhou-internal.aliyuncs.com"
+		// ali.Endpoint = "https://oss-cn-hangzhou-internal.aliyuncs.com"
+		ali.Endpoint = "oss-cn-hangzhou-internal.aliyuncs.com"
 	} else {
-		endpoint = "https://oss-cn-hangzhou.aliyuncs.com"
+		// ali.Endpoint = "https://oss-cn-hangzhou.aliyuncs.com"
+		ali.Endpoint = "oss-cn-hangzhou.aliyuncs.com"
 	}
 
-	client, err = oss.New(endpoint, ali.AccKey, ali.AccSec)
+	client, err = oss.New(ali.Endpoint, ali.AccKey, ali.AccSec)
 	if err != nil {
 		logrus.Errorln("oss.New() Error:", err)
 		panic(err)
@@ -69,7 +75,7 @@ func (ali *Config) getBucket() (*oss.Bucket, error) {
 
 }
 
-func (ali *Config) Put(object, file string) (err error) {
+func (ali *Config) Put(object, file string) (fileurl string, err error) {
 
 	bucket, err := ali.getBucket()
 	if err != nil {
@@ -80,8 +86,26 @@ func (ali *Config) Put(object, file string) (err error) {
 	err = bucket.PutObjectFromFile(object, file)
 	if err != nil {
 		logrus.Debugln("Put File:", err)
-		return err
+		return "", err
 	}
 
-	return nil
+	return fmt.Sprintf("%s.%s", ali.BucketName, ali.Endpoint), nil
 }
+
+// func (ali *Config) Upload(file string) (string, error) {
+
+// 	// ali.Endpoint
+// 	// if len(ali.CustomDomain) == 0 {
+// 	// 	ali.CustomDomain = ali.Endpoint
+// 	// }
+
+// 	object := ali.Prefix + "/" + path.Base(file)
+
+// 	_, err := ali.Put(object, file)
+// 	if err != nil {
+// 		return "", err
+// 	}
+// 	s := fmt.Sprintf("%s/%s", object, object)
+// 	return s, nil
+
+// }

@@ -7,7 +7,8 @@ import (
 )
 
 type StorageClient interface {
-	Put(object, file string) error
+	Put(object, file string) (string, error)
+	// Upload(file string) (string, error)
 }
 
 func New(config *Config) (StorageClient, error) {
@@ -27,5 +28,10 @@ func New(config *Config) (StorageClient, error) {
 		return nil, errors.New("Storage Qcloud COS Invalid")
 
 	}
+
 	return nil, errors.New("Invalid Storage Client")
+}
+
+func Upload(config *Config) {
+
 }

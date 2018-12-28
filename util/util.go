@@ -1,6 +1,9 @@
 package util
 
 import (
+	"crypto/md5"
+	"fmt"
+	"io"
 	"os"
 
 	"github.com/sirupsen/logrus"
@@ -28,4 +31,23 @@ func IsDirectory(path string) (bool, error) {
 
 	logrus.Debugln(path, "is not a directory")
 	return false, nil
+}
+
+func GetMd5(file string) (string, error) {
+
+	if ok, err := IsFileExist(file); !ok {
+		logrus.Errorln(err)
+		return "", err
+	}
+
+	// b, err := ioutil.ReadFile(file)
+	fi, err := os.Open(file)
+	if err != nil {
+		logrus.Errorln(err)
+		return "", err
+	}
+
+	h := md5.New()
+	io.Copy(h, fi)
+	return fmt.Sprintf("%x", h.Sum(nil)), nil
 }
