@@ -89,7 +89,7 @@ func (ali *Config) Put(object, file string) (fileurl string, err error) {
 		return "", err
 	}
 
-	return fmt.Sprintf("%s.%s", ali.BucketName, ali.Endpoint), nil
+	return fmt.Sprintf("%s.%s/%s", ali.BucketName, ali.Endpoint, object), nil
 }
 
 // func (ali *Config) Upload(file string) (string, error) {

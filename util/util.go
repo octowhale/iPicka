@@ -51,3 +51,11 @@ func GetMd5(file string) (string, error) {
 	io.Copy(h, fi)
 	return fmt.Sprintf("%x", h.Sum(nil)), nil
 }
+
+func GetEnvDefault(key, defaults string) string {
+	v := os.Getenv(key)
+	if len(v) == 0 {
+		return defaults
+	}
+	return v
+}

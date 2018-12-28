@@ -1,14 +1,12 @@
 package main
 
 import (
-	"fmt"
 	"path"
 	"strings"
 
 	"github.com/octowhale/iPicka/backend"
 	"github.com/octowhale/iPicka/storage"
 	"github.com/octowhale/iPicka/util"
-	log "github.com/qiniu/x/log.v7"
 	"github.com/sirupsen/logrus"
 )
 
@@ -20,7 +18,7 @@ func Once(file string, HTTPSSchema string) {
 		panic(err)
 	}
 
-	log.Infof("fileUrl: %s", fileUrl)
+	logrus.Infof("fileUrl: %s", fileUrl)
 	SetDB(HTTPSSchema+fileUrl, file)
 
 }
@@ -53,24 +51,34 @@ func Upload(file string) (string, error) {
 	logrus.Infof("UPload: %s", fileUrl)
 
 	return fileUrl, nil
+
 }
 
-func SetDB(fileUrl, file string) error {
+func SetDB(fileUrl, file string) (string, error) {
 
 	md5sum, err := util.GetMd5(file)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	backendClient, _ := backend.New(config.Backend)
 
-	_, err = backendClient.Set(md5sum, fileUrl)
+	url, err := backendClient.Get(md5sum)
 	if err != nil {
-		return err
+		return "", err
+	} else {
+		// return url
+
+		logrus.Debugln(url)
+		return url, nil
 	}
 
-	s, _ := backendClient.Get(md5sum)
-	fmt.Println(s)
+	_, err = backendClient.Set(md5sum, fileUrl)
+	if err != nil {
+		return "", err
+	}
+	url, _ = backendClient.Get(md5sum)
+	logrus.Debugln(url)
 
-	return nil
+	return url, nil
 }

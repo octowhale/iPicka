@@ -1,16 +1,11 @@
 package main
 
-import (
-	"github.com/sirupsen/logrus"
-)
-
 func main() {
 
-	logrus.SetLevel(logrus.DebugLevel)
-	// logrus.SetLevel(logrus.InfoLevel)
-	// logrus.SetLevel(logrus.ErrorLevel)
-
-	logrus.Debugln(config.Storage)
+	// logrus.Debugln(config.Storage)
+	// Logger := logger.LogConfig{ENV: "debug"}
+	// Logger.SetEnv(Logger.ENV)
+	// Logger.SetLevel(Logger.Level)
 
 	var HTTPSSchema string
 	if config.Storage.HTTPS {
@@ -22,4 +17,5 @@ func main() {
 	file := "/data/tmp/naruto.jpg"
 
 	Once(file, HTTPSSchema)
+
 }

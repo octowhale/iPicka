@@ -6,6 +6,9 @@ import (
 	"os"
 	"path"
 
+	"github.com/octowhale/iPicka/logger"
+	"github.com/octowhale/iPicka/util"
+
 	"github.com/octowhale/iPicka/backend"
 	"github.com/octowhale/iPicka/storage"
 )
@@ -21,13 +24,13 @@ func init() {
 	data, _ := ioutil.ReadFile(path.Join(os.Getenv("HOME"), "/", ".ipic.json"))
 	json.Unmarshal(data, &config)
 
-	// logrus.Infoln(config.Storage)
-	// storageClient, _ := storage.New(config.Storage)
-	// backendClient, _ := backend.New(config.Backend)
+}
 
-	// err := storageClient.Put("v7/2019-naruto.jpg", "/data/tmp/naruto.jpg")
-	// fmt.Println(err)
-	// backendClient.Set("naruto", "http://cdn.tangx.in/v7/2019-naruto.jpg")
-	// s, _ := backendClient.Get("naruto")
-	// fmt.Println(s)
+func init() {
+	l := logger.LogConfig{
+		ENV:   util.GetEnvDefault("ENV", "dev"),
+		Level: util.GetEnvDefault("LOG_LEVEL", "info"),
+	}
+	l.SetEnv(l.ENV)
+	l.SetLevel(l.Level)
 }

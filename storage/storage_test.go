@@ -4,17 +4,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"os"
-	"path"
 	"testing"
 )
 
 func Test_Storage(t *testing.T) {
 
-	configFile := path.Join(os.Getenv("HOME"), ".ipic.json")
+	// configFile := path.Join(os.Getenv("HOME"), ".ipic.json")
+	configFile := "config.json"
 	fmt.Println(configFile)
 
-	j := Storage{}
+	j := Config{}
 
 	b, _ := ioutil.ReadFile(configFile)
 	json.Unmarshal(b, &j)
@@ -23,6 +22,6 @@ func Test_Storage(t *testing.T) {
 
 	client, _ := New(&j)
 
-	client.Put("v7/", "/data/tmp/naruto.jpg")
+	client.Put("v7/naruto-test.jpg", "/data/tmp/naruto.jpg")
 
 }
