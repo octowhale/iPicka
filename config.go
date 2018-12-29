@@ -28,7 +28,7 @@ func init() {
 
 func init() {
 	l := logger.LogConfig{
-		ENV:   util.GetEnvDefault("ENV", "dev"),
+		ENV:   util.GetEnvDefault("ENV", "online"),
 		Level: util.GetEnvDefault("LOG_LEVEL", "info"),
 	}
 	l.SetEnv(l.ENV)

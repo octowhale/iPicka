@@ -35,7 +35,7 @@ func (log *LogConfig) SetEnv(env string) {
 	if strings.ToLower(env) == "online" {
 		// formatter
 		logrus.SetFormatter(&logrus.JSONFormatter{
-			PrettyPrint: true,
+			// PrettyPrint: true,
 		})
 	}
 
