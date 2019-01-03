@@ -77,18 +77,20 @@ func (ali *Config) getBucket() (*oss.Bucket, error) {
 
 func (ali *Config) Put(object, file string) (fileurl string, err error) {
 
+	logrus.Debugf("Entering Aliyun oss Put")
 	bucket, err := ali.getBucket()
 	if err != nil {
-		logrus.Debugln("Get bucket Error:", err)
+		logrus.Errorln("Get bucket Error:", err)
 		panic(err)
 	}
 
 	err = bucket.PutObjectFromFile(object, file)
 	if err != nil {
-		logrus.Debugln("Put File:", err)
+		logrus.Errorln("Put File: %v", err)
 		return "", err
 	}
 
+	logrus.Debugf("aliyun oss put: %s.%s/%s", ali.BucketName, ali.Endpoint, object)
 	return fmt.Sprintf("%s.%s/%s", ali.BucketName, ali.Endpoint, object), nil
 }
 
@@ -109,3 +111,14 @@ func (ali *Config) Put(object, file string) (fileurl string, err error) {
 // 	return s, nil
 
 // }
+
+func (ali *Config) Ping() error {
+
+	logrus.Debugf("Entering Aliyun oss Put")
+	bucket, err := ali.getBucket()
+	if err != nil {
+		return err
+	}
+	logrus.Debugf("%+v", bucket.BucketName)
+	return nil
+}

@@ -67,3 +67,7 @@ func (my *MysqlAgent) Set(k, v string) (ok bool, err error) {
 
 	return
 }
+
+func (my *MysqlAgent) Ping() {
+
+}

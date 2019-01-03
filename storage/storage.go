@@ -9,6 +9,7 @@ import (
 type StorageClient interface {
 	Put(object, file string) (string, error)
 	// Upload(file string) (string, error)
+	Ping() error
 }
 
 func New(config *Config) (StorageClient, error) {

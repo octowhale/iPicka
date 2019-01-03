@@ -10,6 +10,7 @@ import (
 type BackendClient interface {
 	Set(k, v string) (bool, error)
 	Get(k string) (string, error)
+	Ping()
 }
 
 func New(config *Config) (BackendClient, error) {

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"path"
 	"strings"
 
@@ -12,22 +13,34 @@ import (
 
 func Once(file string, HTTPSSchema string) {
 
-	fileUrl, err := Upload(file)
+	logrus.Debugf("Entering Once")
+
+	// md5sum, _ := util.GetMd5(file)
+	// check exists
+	// s, _ := backend.Get(md5sum)
+	fileURL, err := Upload(file)
 	if err != nil {
-		// logrus.Errorln(err)
-		panic(err)
+		logrus.Errorln(err)
+		// panic(err)
 	}
 
-	logrus.Infof("fileUrl: %s", fileUrl)
-	SetDB(HTTPSSchema+fileUrl, file)
+	logrus.Debugf("fileURL: %s", HTTPSSchema+fileURL)
+	s, _ := SetDB(HTTPSSchema+fileURL, file)
+
+	fmt.Sprintf("![](%s)", s)
 
 }
 
 func Upload(file string) (string, error) {
 
+	logrus.Debugf("Entering Upload")
 	storageClient, _ := storage.New(config.Storage)
 
 	if ok, err := util.IsFileExist(file); !ok {
+		return "", err
+	}
+
+	if ok, err := util.IsSymlink(file); !ok {
 		return "", err
 	}
 
@@ -38,23 +51,24 @@ func Upload(file string) (string, error) {
 		object = path.Base(file)
 	}
 
-	var fileUrl string
+	var fileURL string
+	fileURL, err := storageClient.Put(object, file)
 	if len(config.Storage.CustomDomain) == 0 {
-		fileUrl, err := storageClient.Put(object, file)
+		// start to upload
 		if err != nil {
 			return "", err
 		}
-		return fileUrl, nil
+		return fileURL, nil
 	}
 
-	fileUrl = config.Storage.CustomDomain + "/" + object
-	logrus.Infof("UPload: %s", fileUrl)
+	fileURL = config.Storage.CustomDomain + "/" + object
+	logrus.Debugf("UPload: %s", fileURL)
 
-	return fileUrl, nil
+	return fileURL, nil
 
 }
 
-func SetDB(fileUrl, file string) (string, error) {
+func SetDB(fileURL, file string) (string, error) {
 
 	md5sum, err := util.GetMd5(file)
 	if err != nil {
@@ -66,19 +80,39 @@ func SetDB(fileUrl, file string) (string, error) {
 	url, err := backendClient.Get(md5sum)
 	if err != nil {
 		return "", err
-	} else {
+	}
+	if len(url) != 0 {
 		// return url
-
-		logrus.Debugln(url)
+		logrus.Debugln("Backend Get: ", url)
 		return url, nil
 	}
 
-	_, err = backendClient.Set(md5sum, fileUrl)
+	_, err = backendClient.Set(md5sum, fileURL)
 	if err != nil {
 		return "", err
 	}
-	url, _ = backendClient.Get(md5sum)
-	logrus.Debugln(url)
 
-	return url, nil
+	// url, _ = backendClient.Get(md5sum)
+	// logrus.Debugln(url)
+
+	// return url, nil
+
+	return fileURL, nil
 }
+
+func DirMode(target, HTTPSSchema string) {
+	files, _, _ := util.WalkDirectory(target)
+
+	// logrus.Debugf("%v", files)
+	for _, file := range files {
+		Once(file, HTTPSSchema)
+	}
+}
+
+var backendClient backend.BackendClient
+var storageClient storage.StorageClient
+
+// func init() {
+// 	backendClient, _ := backend.New(config.Backend)
+// 	storageClient, _ := storage.New(config.Storage)
+// }

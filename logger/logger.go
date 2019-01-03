@@ -42,9 +42,9 @@ func (log *LogConfig) SetEnv(env string) {
 	if strings.ToLower(env) == "dev" {
 		logrus.SetFormatter(&logrus.TextFormatter{
 			// ForceColors: false,
-			DisableColors:    true,
+			// DisableColors:    true,
 			DisableTimestamp: false,
-			DisableSorting:   true,
+			// DisableSorting:   true,
 			FieldMap: logrus.FieldMap{
 				logrus.FieldKeyTime:  "timestamp",
 				logrus.FieldKeyLevel: "level",

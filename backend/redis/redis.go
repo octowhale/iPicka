@@ -46,7 +46,7 @@ func tryConnect(host, port, password, dbname string) (client *redis.Client, err 
 		Password: password,
 	})
 
-	log.Debugln("Ping-pong test: this should be only run once")
+	log.Errorln("Ping-pong test: this should be only run once")
 	_, err = client.Ping().Result()
 	if err != nil {
 		log.Errorf("Redis Ping() Error: %v", err)
@@ -102,17 +102,19 @@ func (r *RedisAgent) Set(k, v string) (ok bool, err error) {
 func (r *RedisAgent) Get(k string) (s string, err error) {
 	client, err := r.Conn()
 	if err != nil {
-		log.Errorln(err)
+		log.Debugf("Redis r.Conn(%v) Error: %v", k, err)
+		return s, err
 	}
 
-	stat := client.Get(k)
-	err = stat.Err()
-	if err != nil {
-		log.Errorln(err)
-		return "", err
-	}
+	// stat := client.Get(k).String()
+	// // err = stat.Err()
+	// s = client.Get(k).String()
+	// log.Debugf("client.Get(%v).String()=> %v", k, s)
 
-	return stat.Val(), nil
+	s = client.Get(k).Val()
+	log.Debugf("client.Get(%v).Val()=> %v", k, s)
+
+	return s, nil
 }
 
 func (r *RedisAgent) Status() {
@@ -129,4 +131,8 @@ func (r *RedisAgent) Status() {
 	log.Infoln("redis pool Timeouts:", ps.Timeouts)
 	log.Infoln("redis pool Hits:", ps.Hits)
 	log.Infoln("redis pool Misses:", ps.Misses)
+}
+
+func (r *RedisAgent) Ping() {
+	r.Status()
 }

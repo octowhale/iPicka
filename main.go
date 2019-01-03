@@ -1,5 +1,13 @@
 package main
 
+import (
+	"os"
+
+	"github.com/sirupsen/logrus"
+
+	"github.com/octowhale/iPicka/util"
+)
+
 func main() {
 
 	// logrus.Debugln(config.Storage)
@@ -14,8 +22,17 @@ func main() {
 		HTTPSSchema = "http://"
 	}
 
-	file := "/data/tmp/naruto.jpg"
+	// file := "/data/tmp/naruto.jpg"
+	targets := os.Args[1:]
 
-	Once(file, HTTPSSchema)
+	for _, target := range targets {
+		logrus.Debugf("target = %v", target)
+		if ok, _ := util.IsDirectory(target); ok {
+			logrus.Debugf("%v enter DirMode", target)
+			DirMode(target, HTTPSSchema)
+		} else {
+			Once(target, HTTPSSchema)
+		}
+	}
 
 }

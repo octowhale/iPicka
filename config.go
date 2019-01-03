@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"io/ioutil"
+	"log"
 	"os"
 	"path"
 
@@ -23,6 +24,17 @@ var config *Config
 func init() {
 	data, _ := ioutil.ReadFile(path.Join(os.Getenv("HOME"), "/", ".ipic.json"))
 	json.Unmarshal(data, &config)
+	storageClient, err := storage.New(config.Storage)
+	if err != nil {
+		log.Fatal("%+v", err)
+	}
+	storageClient.Ping()
+
+	backendClient, err := backend.New(config.Backend)
+	if err != nil {
+		log.Fatal("%+v", err)
+	}
+	backendClient.Ping()
 
 }
 
