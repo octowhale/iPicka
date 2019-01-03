@@ -5,8 +5,6 @@ import (
 	"path"
 	"strings"
 
-	"github.com/octowhale/iPicka/backend"
-	"github.com/octowhale/iPicka/storage"
 	"github.com/octowhale/iPicka/util"
 	"github.com/sirupsen/logrus"
 )
@@ -34,15 +32,17 @@ func Once(file string, HTTPSSchema string) {
 func Upload(file string) (string, error) {
 
 	logrus.Debugf("Entering Upload")
-	storageClient, _ := storage.New(config.Storage)
+	// storageClient, _ := storage.New(config.Storage)
 
 	if ok, err := util.IsFileExist(file); !ok {
 		return "", err
 	}
+	logrus.Debugf("Files Exist check done!")
 
 	if ok, err := util.IsSymlink(file); !ok {
 		return "", err
 	}
+	logrus.Debugf("Files symblink check done!")
 
 	var object string
 	if len(config.Storage.Prefix) != 0 {
@@ -50,8 +50,13 @@ func Upload(file string) (string, error) {
 	} else {
 		object = path.Base(file)
 	}
+	logrus.Debugf("object combination done: object = %v", object)
 
+	fmt.Printf("dafjlaksdjfalsdfj %v\n", config.Backend)
+	fmt.Println("")
 	var fileURL string
+	// storageClient 设置为全局变量之后， 在这里不能使用。
+	storageClient.Ping()
 	fileURL, err := storageClient.Put(object, file)
 	if len(config.Storage.CustomDomain) == 0 {
 		// start to upload
@@ -75,7 +80,7 @@ func SetDB(fileURL, file string) (string, error) {
 		return "", err
 	}
 
-	backendClient, _ := backend.New(config.Backend)
+	// backendClient, _ := backend.New(config.Backend)
 
 	url, err := backendClient.Get(md5sum)
 	if err != nil {
@@ -108,11 +113,3 @@ func DirMode(target, HTTPSSchema string) {
 		Once(file, HTTPSSchema)
 	}
 }
-
-var backendClient backend.BackendClient
-var storageClient storage.StorageClient
-
-// func init() {
-// 	backendClient, _ := backend.New(config.Backend)
-// 	storageClient, _ := storage.New(config.Storage)
-// }

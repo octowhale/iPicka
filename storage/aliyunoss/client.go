@@ -83,6 +83,7 @@ func (ali *Config) Put(object, file string) (fileurl string, err error) {
 		logrus.Errorln("Get bucket Error:", err)
 		panic(err)
 	}
+	logrus.Debugf("Aliyun oss Bucket Loaded sucess.")
 
 	err = bucket.PutObjectFromFile(object, file)
 	if err != nil {
@@ -119,6 +120,13 @@ func (ali *Config) Ping() error {
 	if err != nil {
 		return err
 	}
-	logrus.Debugf("%+v", bucket.BucketName)
+	// fmt.Println("hello")
+
+	logrus.Debugf("aliyun Storage Ping %+v", bucket)
+	// listBucketResult, err := bucket.ListObjects()
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// logrus.Debugf("listBucketResult: %+v", listBucketResult.)
 	return nil
 }
