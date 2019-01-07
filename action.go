@@ -25,7 +25,7 @@ func Once(file string, HTTPSSchema string) {
 	logrus.Debugf("fileURL: %s", HTTPSSchema+fileURL)
 	s, _ := SetDB(HTTPSSchema+fileURL, file)
 
-	fmt.Sprintf("![](%s)", s)
+	fmt.Printf("![](%s)\n", s)
 
 }
 
@@ -52,7 +52,6 @@ func Upload(file string) (string, error) {
 	}
 	logrus.Debugf("object combination done: object = %v", object)
 
-	fmt.Printf("dafjlaksdjfalsdfj %v\n", config.Backend)
 	fmt.Println("")
 	var fileURL string
 	// storageClient 设置为全局变量之后， 在这里不能使用。
