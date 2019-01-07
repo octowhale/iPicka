@@ -87,7 +87,7 @@ func (ali *Config) Put(object, file string) (fileurl string, err error) {
 
 	err = bucket.PutObjectFromFile(object, file)
 	if err != nil {
-		logrus.Errorln("Put File: %v", err)
+		logrus.Errorf("Put File: %v", err)
 		return "", err
 	}
 
